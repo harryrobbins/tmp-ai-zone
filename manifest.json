@@ -1,26 +1,108 @@
 {
-  "title": "Gen AI Exploration Zone",
-  "description": "A Flask application for experimenting with AI prompts using GPT-4o and GPT-4o-mini models.",
-  "tags": [
-    "AI",
-    "Flask",
-    "GPT-4o",
-    "OpenAI",
-    "HMRC"
-  ],
-  "runtime": "python",
+  "version": 1,
+  "locale": "English_United Kingdom.1252",
+  "metadata": {
+    "appmode": "python-api",
+    "entrypoint": "app"
+  },
   "python": {
-    "version": "3.11",
-    "requirements_file": "requirements.txt"
+    "version": "3.11.9",
+    "package_manager": {
+      "name": "pip",
+      "version": "24.0",
+      "package_file": "requirements.txt"
+    }
   },
-  "image": {},
-  "app_mode": "python-api",
-  "entrypoint": "app:app",
-  "environment": {
-    "FLASK_ENV": "production"
-  },
-  "resources": {
-    "memory_mb": 1024,
-    "cpu_cores": 1
+  "files": {
+    "requirements.txt": {
+      "checksum": "f3756b86d1fbec8968770a2097589e37"
+    },
+    ".env": {
+      "checksum": "c5e95b23cf7723550fd9459d81c239a1"
+    },
+    ".env.example": {
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    ".gitignore": {
+      "checksum": "df42404a7dba6c43c2a08486f3a5c0da"
+    },
+    ".idea/.gitignore": {
+      "checksum": "9117c65ed9ff083256a86af10ab88d65"
+    },
+    ".idea/ai-zone.iml": {
+      "checksum": "2b56ebd1c7bbcf66f2c3ef4627af05a8"
+    },
+    ".idea/inspectionProfiles/Project_Default.xml": {
+      "checksum": "61ab934697547df7c048f56838e25c52"
+    },
+    ".idea/inspectionProfiles/profiles_settings.xml": {
+      "checksum": "05dbe611f5bdb7a801adb3f064d4bfa9"
+    },
+    ".idea/misc.xml": {
+      "checksum": "dd65519579d634e858fff1bbe8afa190"
+    },
+    ".idea/modules.xml": {
+      "checksum": "ee40c49fe4f9fd2bcf1c13e694af643e"
+    },
+    ".idea/vcs.xml": {
+      "checksum": "a8b625cb090fe904fb7338f6447f50ac"
+    },
+    ".idea/workspace.xml": {
+      "checksum": "4ee49de8e4f0d76b8222364cf7119541"
+    },
+    "POSIT_CONNECT.md": {
+      "checksum": "71b2edaeafcebd2e8cca1da6c9abc8a7"
+    },
+    "README.md": {
+      "checksum": "316c6b7047304b0d477fc0e6232d7875"
+    },
+    "app.py": {
+      "checksum": "d9233017a1a47a6ee1cd5acf5d42c38c"
+    },
+    "bootstrap.py": {
+      "checksum": "b0ba33cb9ac408ac8069de65c7bbef7f"
+    },
+    "config.py": {
+      "checksum": "d2a1984c3fd3e93c10c63f3af34b2da2"
+    },
+    "static/javascripts/application.js": {
+      "checksum": "b2c37bbf27fe3ad44ea7948660bc7041"
+    },
+    "static/stylesheets/application.css": {
+      "checksum": "2ea39a311bf08825e69c597cc1340363"
+    },
+    "templates/base.html": {
+      "checksum": "7ac8cae01f9fa9b53b5dadc118f21ead"
+    },
+    "templates/index.html": {
+      "checksum": "7fd54629ffbc5f50238a1c71401375cb"
+    },
+    "templates/partials/footer.html": {
+      "checksum": "ec27dfad03a303d239922811be87bf96"
+    },
+    "templates/partials/header.html": {
+      "checksum": "3ec61e811d3756ab9341f2c73453d5c4"
+    },
+    "templates/results.html": {
+      "checksum": "e836a2e75e72a2421f89aea21b51f33b"
+    },
+    "uploads/What_Happens_to_SaaS_in_a_World_with_Computer_Using_Agents_.docx": {
+      "checksum": "76a19a00107593de43c2e478945e04dd"
+    },
+    "utils/__pycache__/document_parser.cpython-311.pyc": {
+      "checksum": "1ea3e88d4eb1a9e563e49b3c7957684d"
+    },
+    "utils/__pycache__/openai_client.cpython-311.pyc": {
+      "checksum": "417ecc5a4ae19b6d76767593b5620732"
+    },
+    "utils/document_parser.py": {
+      "checksum": "0acc9a8fa24b231fd20db2ba21a5141f"
+    },
+    "utils/openai_client.py": {
+      "checksum": "9944d3d4d160d28d7162db53a51ff697"
+    },
+    "wsgi.py": {
+      "checksum": "516af01a2be293bee060d0833dbb3c0d"
+    }
   }
 }
