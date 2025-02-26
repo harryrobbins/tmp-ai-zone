@@ -7,6 +7,7 @@ import datetime
 from config import Config
 from utils.openai_client import OpenAIClient
 from utils.document_parser import parse_document
+from flask_session import Session
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -14,6 +15,15 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
+# Configure sessions
+if app.config['SUBDIRECTORY_PATH']:
+    app.config['SESSION_COOKIE_PATH'] = app.config['SUBDIRECTORY_PATH']
+
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['SESSION_FILE_DIR'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'flask_session')
+os.makedirs(app.config['SESSION_FILE_DIR'], exist_ok=True)
+Session(app)
 
 # Initialize OpenAI client
 openai_client = OpenAIClient(api_key=app.config['OPENAI_API_KEY'])
@@ -24,6 +34,7 @@ class PrefixMiddleware:
     def __init__(self, app, prefix=''):
         self.app = app
         self.prefix = prefix
+        print(f"Configuring app with prefix: {prefix}")
 
     def __call__(self, environ, start_response):
         if environ['PATH_INFO'].startswith(self.prefix):
@@ -38,6 +49,7 @@ class PrefixMiddleware:
 # Apply the prefix middleware if we're in a subdirectory
 if app.config['SUBDIRECTORY_PATH']:
     app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix=app.config['SUBDIRECTORY_PATH'])
+    print(f"Using subdirectory: {app.config['SUBDIRECTORY_PATH']}")
 
 # Ensure the upload folder exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -53,7 +65,8 @@ def get_session_uploads():
 @app.route('/')
 def index():
     return render_template('index.html', uploads=get_session_uploads(),
-                          is_connect=app.config['IS_CONNECT'])
+                           is_connect=app.config['IS_CONNECT'])
+
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -91,6 +104,7 @@ def upload_file():
             'type': ext[1:]  # Remove the dot from extension
         })
         session['uploads'] = uploads
+        session.modified = True
 
     return redirect(url_for('index'))
 
@@ -110,6 +124,7 @@ def remove_file(filename):
             # Remove from session
             uploads.pop(i)
             session['uploads'] = uploads
+            session.modified = True
             break
 
     return redirect(url_for('index'))
@@ -182,6 +197,7 @@ def submit_prompt():
         try:
             response = openai_client.get_completion(combined_prompt, model)
             responses[model] = response
+            print(f"Got response from {model}, length: {len(response)} characters")
         except Exception as e:
             error_message = str(e)
             logger.error(f"Error from OpenAI API ({model}): {error_message}")
@@ -190,8 +206,16 @@ def submit_prompt():
     # Store responses in session for display
     session['responses'] = responses
     session['prompt'] = prompt
+    session.modified = True
 
-    return redirect(url_for('results'))
+    # Debug: print the stored session data
+    print(f"Stored in session - prompt length: {len(session.get('prompt', ''))}")
+    print(f"Stored in session - responses: {list(session.get('responses', {}).keys())}")
+
+    # Use url_for with _scheme and _external to ensure proper redirection
+    results_url = url_for('results')
+    print(f"Redirecting to: {results_url}")
+    return redirect(results_url)
 
 
 @app.route('/results')
@@ -200,7 +224,10 @@ def results():
     responses = session.get('responses', {})
     prompt = session.get('prompt', '')
 
+    print(f"Results route - found prompt: {bool(prompt)}, responses: {list(responses.keys()) if responses else 'None'}")
+
     if not responses:
+        print("No responses found in session, redirecting to index")
         return redirect(url_for('index'))
 
     # Get model display names
@@ -218,11 +245,42 @@ def results():
             'response': response
         })
 
+    print(f"Rendering results template with {len(formatted_responses)} responses")
     return render_template('results.html',
                            prompt=prompt,
                            responses=formatted_responses,
                            single_response=len(formatted_responses) == 1,
                            is_connect=app.config['IS_CONNECT'])
+
+
+@app.route('/debug')
+def debug_info():
+    """Debug route to show configuration information"""
+    debug_data = {
+        'SUBDIRECTORY_PATH': app.config['SUBDIRECTORY_PATH'],
+        'IS_CONNECT': app.config['IS_CONNECT'],
+        'URL_MAP': str(app.url_map),
+        'SESSION_COOKIE_PATH': app.config.get('SESSION_COOKIE_PATH', 'Not set'),
+        'SESSION_TYPE': app.config.get('SESSION_TYPE', 'Not set'),
+        'SESSION_DATA': {
+            'has_prompt': 'prompt' in session,
+            'has_responses': 'responses' in session,
+            'session_keys': list(session.keys())
+        }
+    }
+
+    # Generate URLs for all routes
+    routes = {}
+    for rule in app.url_map.iter_rules():
+        if 'GET' in rule.methods and rule.endpoint != 'static':
+            try:
+                routes[rule.endpoint] = url_for(rule.endpoint, _external=True)
+            except:
+                routes[rule.endpoint] = "Cannot generate URL"
+
+    debug_data['ROUTES'] = routes
+
+    return jsonify(debug_data)
 
 
 @app.before_request
@@ -245,11 +303,6 @@ def nl2br(value):
     # Convert newlines to <br> tags for displaying multiline text
     return value.replace('\n', '<br>')
 
-@app.before_request
-def before_request():
-    # Add current deployment info to global template variables
-    g.deployment_env = "Posit Connect" if app.config['IS_CONNECT'] else "Development"
-    g.current_year = datetime.datetime.now().year
 
 if __name__ == '__main__':
     app.run(debug=True)
