@@ -1,0 +1,23 @@
+---
+title: "Gen AI Exploration Zone"
+description: "A Flask application for experimenting with AI prompts using GPT-4o and GPT-4o-mini models."
+tags:
+  - "AI"
+  - "Flask"
+  - "GPT-4o"
+  - "OpenAI"
+  - "HMRC"
+runtime: python
+python:
+  version: "3.11"
+  requirements_file: "requirements.txt"
+image: {}
+app_mode: "python-api"
+entrypoint: "app:app"
+environment:
+  FLASK_ENV: "production"
+  # OPENAI_API_KEY should be set in the Posit Connect environment variables
+  # SECRET_KEY should be set in the Posit Connect environment variables
+resources:
+  memory_mb: 1024
+  cpu_cores: 1

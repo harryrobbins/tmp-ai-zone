@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}Gen AI Exploration Zone{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-xl">
+      Gen AI Exploration Zone
+    </h1>
+  </div>
+</div>
+
+<div class="govuk-grid-row" style="margin-bottom:40px">
+  <div class="govuk-grid-column-two-thirds govuk-prototype-kit-common-templates-mainstream-guide-body">
+    <h2 class="govuk-heading-l">
+      What is Gen AI?
+    </h2>
+    <p>Generative artificial intelligence (Gen AI) is a subset of artificial intelligence that uses generative models to produce text, images, videos, or other forms of data.</p>
+    <p>This Gen AI Exploration Zone provides space to experiment with AI prompts. Try out different models and compare them to see which are most effective and efficient. You can use Gen AI to analyse data, write and/or optimise code, automate documentation and much more.</p>
+    <a href="#">Learn more about Gen AI</a>
+  </div>
+</div>
+
+<div class="govuk-grid-row" style="margin-bottom:20px">
+  <div class="govuk-grid-column-two-thirds govuk-prototype-kit-common-templates-mainstream-guide-body">
+    <h2 class="govuk-heading-l">
+      Try out Gen AI
+    </h2>
+    <p>A prompt can be a question or instruction, for example, <b>"Analyse this data"</b> or <b>"What is this document about?"</b> When referencing a document, make sure to upload it before submitting your prompt.</p>
+    <a href="#">Learn about different types of prompts</a>
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds govuk-prototype-kit-common-templates-mainstream-guide-body">
+    <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+      <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+          Important
+        </h2>
+      </div>
+      <div class="govuk-notification-banner__content">
+        <p class="govuk-notification-banner__heading">
+          Do not enter any sensitive or confidential information
+          <a class="govuk-notification-banner__link" href="#">What is sensitive data?</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<form method="post" action="{{ url_for('submit_prompt') }}" enctype="multipart/form-data">
+  <div class="govuk-grid-row" style="margin-bottom:20px">
+    <div class="govuk-grid-column-two-thirds govuk-prototype-kit-common-templates-mainstream-guide-body">
+      <div class="govuk-form-group">
+        <h1 class="govuk-label-wrapper">
+          <label class="govuk-label govuk-label--l" for="prompt">
+            Enter prompt
+          </label>
+        </h1>
+        <div id="enter-prompt-hint" class="govuk-hint">
+          Ask a question or give an instruction
+        </div>
+        <textarea class="govuk-textarea" id="prompt" name="prompt" rows="5" aria-describedby="enter-prompt-hint"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="govuk-grid-row" style="margin-bottom:40px">
+    <div class="govuk-grid-column-two-thirds">
+      <h2 class="govuk-heading-m">Upload documents for analysis or reference</h2>
+      <div id="file-upload-hint" class="govuk-hint">
+        Upload PDF, Word (DOCX), Excel (XLSX/XLS), CSV, or image files (JPG, PNG). Files must be smaller than 100MB.
+      </div>
+
+      <p class="govuk-body" aria-live="polite">
+        {% if uploads %}
+          {{ uploads|length }} of 2 files uploaded
+        {% else %}
+          0 of 2 files uploaded
+        {% endif %}
+      </p>
+
+      <div class="govuk-form-group">
+        <label class="govuk-label" for="file-upload">
+          Upload a file
+        </label>
+        <input class="govuk-file-upload" id="file-upload" name="file" type="file">
+      </div>
+
+      <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button" formaction="{{ url_for('upload_file') }}">
+        Upload document
+      </button>
+
+      {% if uploads %}
+        <dl class="govuk-summary-list govuk-summary-list--long-key">
+          {% for upload in uploads %}
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                {{ upload.filename }}
+              </dt>
+              <dd class="govuk-summary-list__value">
+                <strong class="govuk-tag govuk-tag--green">
+                  {{ upload.status }}
+                </strong>
+              </dd>
+              <dd class="govuk-summary-list__actions">
+                <a class="govuk-link" href="{{ url_for('remove_file', filename=upload.filename) }}">
+                  Remove<span class="govuk-visually-hidden"> {{ upload.filename }}</span>
+                </a>
+              </dd>
+            </div>
+          {% endfor %}
+        </dl>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-form-group">
+        <fieldset class="govuk-fieldset">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+            Which models do you want to compare?
+          </legend>
+          <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+            <div class="govuk-checkboxes__item">
+              <input class="govuk-checkboxes__input" id="modelComparison1" name="modelComparison" type="checkbox" value="gpt-4o">
+              <label class="govuk-label govuk-checkboxes__label" for="modelComparison1">
+                GPT-4o
+              </label>
+            </div>
+            <div class="govuk-checkboxes__item">
+              <input class="govuk-checkboxes__input" id="modelComparison2" name="modelComparison" type="checkbox" value="gpt-4o-mini">
+              <label class="govuk-label govuk-checkboxes__label" for="modelComparison2">
+                GPT-4o Mini
+              </label>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+
+      <button type="submit" class="govuk-button" data-module="govuk-button">
+        Submit prompt
+      </button>
+    </div>
+  </div>
+
+  <div class="govuk-grid-column-one-third">
+    <aside class="govuk-prototype-kit-common-templates-related-items" role="complementary">
+      <h2 class="govuk-heading-m" id="subsection-title">
+        Resources & useful links
+      </h2>
+      <nav role="navigation" aria-labelledby="subsection-title">
+        <ul class="govuk-list govuk-!-font-size-16">
+          <li>
+            <a href="#">
+              Related link
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              Related link
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              Related link
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              Related link
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+  </div>
+</form>
+{% endblock %}

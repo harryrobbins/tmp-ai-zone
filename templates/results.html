@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Results - Gen AI Exploration Zone{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-xl">
+      AI Response Results
+    </h1>
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <div class="govuk-panel govuk-panel--confirmation">
+      <h2 class="govuk-panel__title">
+        Results Generated
+      </h2>
+      <div class="govuk-panel__body">
+        Your prompt has been processed
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="govuk-grid-row" style="margin-top:30px;">
+  <div class="govuk-grid-column-two-thirds">
+    <h2 class="govuk-heading-m">Your Prompt</h2>
+    <div class="govuk-inset-text">
+      {{ prompt }}
+    </div>
+
+    <a href="{{ url_for('index') }}" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+      Try Another Prompt
+    </a>
+  </div>
+</div>
+
+{% if single_response %}
+<!-- Single response layout -->
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <div class="govuk-card">
+      <div class="govuk-card__header">
+        <h2 class="govuk-heading-m">{{ responses[0].model_name }} Response</h2>
+      </div>
+      <div class="govuk-card__content">
+        <div class="govuk-body response-content">
+          {{ responses[0].response|nl2br|safe }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% else %}
+<!-- Multiple responses for comparison -->
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <h2 class="govuk-heading-m">Model Comparison</h2>
+
+    <div class="response-grid">
+      {% for response in responses %}
+        <div class="govuk-card response-card">
+          <div class="govuk-card__header">
+            <h3 class="govuk-heading-s">{{ response.model_name }}</h3>
+          </div>
+          <div class="govuk-card__content">
+            <div class="govuk-body response-content">
+              {{ response.response|nl2br|safe }}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="govuk-grid-row" style="margin-top:40px; margin-bottom:40px;">
+  <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-warning-text">
+      <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+      <strong class="govuk-warning-text__text">
+        <span class="govuk-warning-text__assistive">Warning</span>
+        AI-generated responses should be reviewed for accuracy and appropriateness before use.
+      </strong>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .govuk-card {
+    border: 1px solid #b1b4b6;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #fff;
+  }
+
+  .govuk-card__header {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #b1b4b6;
+  }
+
+  .response-content {
+    white-space: pre-line;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .response-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 768px) {
+    .response-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .response-card {
+    height: 100%;
+    overflow: auto;
+    max-height: 800px;
+  }
+</style>
+{% endblock %}
